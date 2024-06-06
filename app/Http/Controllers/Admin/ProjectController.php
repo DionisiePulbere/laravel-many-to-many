@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Type;
+use App\Models\Technology;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
@@ -31,7 +32,8 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::all();
-        return view('admin.projects.create', compact('types'));
+        $technologies = Technology::all();
+        return view('admin.projects.create', compact('types', 'technologies'));
     }
 
     /**
@@ -48,7 +50,8 @@ class ProjectController extends Controller
                 'summary' => 'nullable|min:10',
                 'client_name' => 'required|min:4|max:150',
                 'cover_image' => 'nullable|image|max:512',
-                'type_id' => 'nullable|exists:types,id'
+                'type_id' => 'nullable|exists:types,id',
+                'technologies' => 'nullable|exists:technologies,id'
             ]
         );
         
@@ -63,6 +66,10 @@ class ProjectController extends Controller
         $newProject->slug = Str::slug($newProject->name, '-');
         $newProject->save();
 
+        if($request->has('technologies')) {
+            $newProject->technologies()->attach($formData['technologies']);
+        }
+
        return redirect()->route('admin.projects.show', ['project' => $newProject->id]);
     }
 
@@ -74,10 +81,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {    
-        $data = [
-            'project' => $project
-        ];
-        return view('admin.projects.show', $data);
+
+        return view('admin.projects.show', compact('project'));
     }
 
     /**
@@ -89,8 +94,9 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $types = Type::all();
+        $technologies = Technology::all();
 
-        return view('admin.projects.edit', compact('project', 'types'));
+        return view('admin.projects.edit', compact('project', 'types', 'technologies'));
     }
 
     /**
@@ -113,7 +119,8 @@ class ProjectController extends Controller
                 'summary' => 'nullable|min:10',
                 'client_name' => 'required|min:4|max:150',
                 'cover_image' => 'nullable|image|max:512',
-                'type_id' => 'nullable|exists:types,id'
+                'type_id' => 'nullable|exists:types,id',
+                'technologies' => 'nullable|exists:technologies,id'
             ]
         );
 
@@ -127,6 +134,12 @@ class ProjectController extends Controller
         }
         $project->slug = Str::slug($formData['name'], '-');
         $project->update($formData);
+
+        if($request->has('technologies')) {
+            $project->technologies()->sync($formData['technologies']);
+        } else {
+            $project->technologies()->detach();
+        }
 
         return redirect()->route('admin.projects.show', ['project' => $project->id]);
     }

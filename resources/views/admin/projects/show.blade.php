@@ -16,6 +16,16 @@
     <div>
         <strong>Type:</strong> {{ $project->type ? $project->type->name : 'No type' }}
     </div>
+    <div class="d-flex">
+        <strong class="me-2">Technology:</strong>
+        @if (count($project->technologies) > 0)
+            @foreach($project->technologies as $technology)
+                {{ $technology->name }} @if(!$loop-last),@endif
+            @endforeach
+        @else
+            <div>No Technology</div>
+        @endif
+    </div>
     <div>
         <strong>Creato il:</strong> {{ $project->created_at }}
     </div>
