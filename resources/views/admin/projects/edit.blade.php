@@ -29,6 +29,21 @@
             </select>
         </div>
         <div class="mb-3">
+            @foreach ($technologies as $technology)
+                <div class="form-check">
+                    @if ($errors->any())
+                        <input class="form-check-input" @checked(in_array($technology->id, old('technologies', []))) type="checkbox" name="technologies[]" value="{{ $technology->id }}" id="technology-{{ $technology->id }}">
+                    @else
+                        <input class="form-check-input" @checked($project->technologies->contains($technology)) type="checkbox" name="technologies[]" value="{{ $technology->id }}" id="technology-{{ $technology->id }}">
+                    @endif
+                    
+                    <label class="form-check-label" for="technology-{{ $technology->id }}">
+                    {{ $technology->name }}
+                    </label>
+                </div>
+            @endforeach
+        </div>
+        <div class="mb-3">
             <label for="cover_image" class="form-label">Immagine</label>
             <input class="form-control" type="file" id="cover_image" name="cover_image">
             @if($project->cover_image)

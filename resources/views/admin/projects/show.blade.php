@@ -20,7 +20,7 @@
         <strong class="me-2">Technology:</strong>
         @if (count($project->technologies) > 0)
             @foreach($project->technologies as $technology)
-                {{ $technology->name }} @if(!$loop-last),@endif
+                {{ $technology->name }} @if(!$loop->last),@endif
             @endforeach
         @else
             <div>No Technology</div>
